@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Note Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+    <div class="w-full max-w-2xl mx-auto bg-white rounded-xl shadow-lg p-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">My Voice Note Generator</h1>
+        <p class="text-gray-600 mb-6">Type your message below. It will be converted to a voice note and sent to your personal WhatsApp number. You can then forward it to anyone.</p>
+
+        <div class="space-y-4">
+            <textarea id="message-text" rows="6" class="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="Enter your message here..."></textarea>
+            
+            <button id="send-button" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-300 ease-in-out disabled:bg-gray-400">
+                Generate & Send Voice Note
+            </button>
+        </div>
+        
+        <p id="status-message" class="mt-4 text-center text-gray-600 h-6"></p>
+
+    </div>
+
+    <script>
+        // --- Configuration --
+        // Your deployed Cloudflare Worker URL.
+        const workerUrl = '/generate-voice-note';
+        
+        // --- Element References ---
+        const sendButton = document.getElementById('send-button');
+        const messageText = document.getElementById('message-text');
+        const statusMessage = document.getElementById('status-message');
+
+        // --- Event Listener ---
+        sendButton.addEventListener('click', async () => {
+            const text = messageText.value.trim();
+
+            if (!text) {
+                statusMessage.textContent = 'Please enter a message.';
+                statusMessage.classList.add('text-red-500');
+                return;
+            }
+
+            // --- Disable UI and show loading state ---
+            sendButton.disabled = true;
+            sendButton.textContent = 'Sending...';
+            statusMessage.textContent = '';
+            statusMessage.classList.remove('text-red-500', 'text-green-500');
+
+            try {
+                // --- Make API call to the worker ---
+                const response = await fetch(workerUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ text: text }),
+                });
+
+                if (!response.ok) {
+                    // Handle server-side errors
+                    throw new Error(`Server responded with status: ${response.status}`);
+                }
+                
+                // --- Success State ---
+                const result = await response.json();
+                console.log('Server response:', result);
+                statusMessage.textContent = 'Voice note sent to your WhatsApp!';
+                statusMessage.classList.add('text-green-500');
+                messageText.value = ''; // Clear the text area
+
+            } catch (error) {
+                // --- Error State ---
+                console.error('Error sending message:', error);
+                statusMessage.textContent = 'Failed to send. Please try again.';
+                statusMessage.classList.add('text-red-500');
+            } finally {
+                // --- Re-enable UI ---
+                sendButton.disabled = false;
+                sendButton.textContent = 'Generate & Send Voice Note';
+            }
+        });
+    </script>
+</body>
+</html>

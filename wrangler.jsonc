@@ -1,9 +1,9 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "twilio-whatsapp-voice-agent",
-  "main": "src/index.ts",
+  "main": "src/index.ts", // Points to index.ts in src directory
   "compatibility_flags": ["nodejs_compat"],
-  "compatibility_date": "2025-06-10",
+  "compatibility_date": "2025-05-25", // Using supported date to avoid warnings
   "assets": {
     "directory": "./public",
     "binding": "ASSETS"
@@ -14,6 +14,7 @@
       "bucket_name": "audio"
     }
   ]
+  // Uncomment and configure these as needed:
   // "vars": {
   //   "MY_VAR": "my-variable"
   // },
