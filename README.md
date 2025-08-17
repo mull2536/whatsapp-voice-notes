@@ -37,8 +37,8 @@ Before you begin, you'll need accounts and API keys from:
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/whatsapp-voice-agent.git
-cd whatsapp-voice-agent
+git clone https://github.com/mull2536/whatsapp-voice-notes.git
+cd whatsapp-voice-notes
 ```
 
 ### 2. Install Dependencies
